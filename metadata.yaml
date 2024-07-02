@@ -1,0 +1,6 @@
+homepage: "https://www.piwik.pro/"
+documentation: "https://developers.piwik.pro/en/latest/data_collection/api/http_api.html"
+versions:
+  # Latest version
+  - sha: TODO
+    changeNotes: TODO
