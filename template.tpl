@@ -14,7 +14,9 @@ ___INFO___
   "version": 1,
   "securityGroups": [],
   "displayName": "Piwik PRO",
-  "categories": ["ANALYTICS"],
+  "categories": [
+    "ANALYTICS"
+  ],
   "brand": {
     "id": "github.com_PiwikPRO",
     "displayName": "Piwik PRO",
@@ -676,7 +678,7 @@ const uiParamMap = {
   _id: data._id || eventData.client_id,
   uid: data.uid || eventData.user_id,
   cip: data.cip || eventData.ip_override,
-  e_t: data.e_t || eventData['x-pp-e_t'],
+  e_t: data.e_t === 'inherit' ? eventData['x-pp-e_t'] : data.e_t,
   ec_id: data.ec_id || eventData['x-pp-ec_id'],
   revenue: data.revenue || eventData.value,
   ec_st: data.ec_st || eventData['x-pp-ec_st'],
