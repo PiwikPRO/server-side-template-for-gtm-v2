@@ -14,9 +14,7 @@ ___INFO___
   "version": 1,
   "securityGroups": [],
   "displayName": "Piwik PRO",
-  "categories": [
-    "ANALYTICS"
-  ],
+  "categories": ["ANALYTICS"],
   "brand": {
     "id": "github.com_PiwikPRO",
     "displayName": "Piwik PRO",
