@@ -1,0 +1,6 @@
+homepage: "https://www.piwik.pro/"
+documentation: "https://developers.piwik.pro/en/latest/data_collection/api/http_api.html"
+versions:
+  # Latest version
+  - sha: 817421fb8153b8318a96a6394be2750410e3a3b2
+    changeNotes: Initial release
