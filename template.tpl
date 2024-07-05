@@ -677,7 +677,7 @@ const uiParamMap = {
   idsite: data.websiteId,
   uia: data.anonymous === 'uia' ? 1 : eventData['x-pp-uia'] || 0,
   rmip: data.anonymous === 'rmip' ? 1 : eventData['x-pp-rmip'] || 0,
-  action_name: data.action_name || eventData['x-pp-action_name'],
+  action_name: data.action_name || eventData['x-pp-action_name'] || (data.eventType === 'pageview' || eventData.event_name === 'page_view' ? eventData.page_title : undefined),
   url: data.url || eventData.page_location,
   urlref: data.urlref || eventData.page_referrer,
   search: data.search || eventData['x-pp-search'],
