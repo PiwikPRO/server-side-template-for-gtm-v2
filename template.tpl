@@ -602,6 +602,8 @@ const sha256Sync = require('sha256Sync');
 const testRegex = require('testRegex');
 
 const ENDPOINT = 'https://' + data.instanceName + '.piwik.pro/ppms.php';
+const LIBRARY_NAME = 'sgtm';
+const LIBRARY_VERSION = '1.0.0';
 const LOG_PREFIX = '[ppms_tag] ';
 
 /** 
@@ -745,6 +747,10 @@ Object.keys(eventData)
 // Overwrite the base request body with values from uiParamMap
 Object.keys(uiParamMap)
   .forEach(key => requestBody[key] = uiParamMap[key]);
+
+// Add the library name and version
+requestBody.ts_n = LIBRARY_NAME;
+requestBody.ts_v = LIBRARY_VERSION;
 
 requestBody = cleanObject(requestBody);
 
