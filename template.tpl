@@ -693,13 +693,13 @@ const uiParamMap = {
   uid: data.uid || eventData.user_id,
   cip: data.cip || eventData.ip_override,
   e_t: data.e_t === 'inherit' ? eventData['x-pp-e_t'] : data.e_t,
-  ec_id: data.ec_id || eventData['x-pp-ec_id'],
-  revenue: data.revenue || eventData.value,
+  ec_id: data.ec_id || eventData['x-pp-ec_id'] || eventData.transaction_id,
+  revenue: data.revenue || (data.eventType === 'ecommerce' ? eventData.value : undefined),
   ec_st: data.ec_st || eventData['x-pp-ec_st'],
   ec_sh: data.ec_sh || eventData['x-pp-ec_sh'],
   ec_tx: data.ec_tx || eventData['x-pp-ec_tx'],
   ec_dt: data.ec_dt || eventData['x-pp-ec_dt'],
-  ec_products: JSON.stringify(convertEcommerce(data.ec_products) || eventData['x-pp-ec_products'])
+  ec_products: data.ec_products === 'inherit' ? eventData['x-pp-ec_products'] || JSON.stringify(convertEcommerce(eventData.items)) : JSON.stringify(convertEcommerce(data.ec_products))
 };
 
 // Set the common event data params
