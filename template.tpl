@@ -621,6 +621,7 @@ const log = msg => {
  */
 const getClientIdHash = () => {
   const clientId = eventData.client_id;
+  if (!clientId) return;
   const clientIdRegex = createRegex('^[0-9a-fA-F]{16}$');
   return testRegex(clientIdRegex, clientId) ? clientId : sha256Sync(clientId, {outputEncoding: 'hex'}).substring(0,16);
 };
