@@ -2,5 +2,5 @@ homepage: "https://www.piwik.pro/"
 documentation: "https://developers.piwik.pro/en/latest/data_collection/api/http_api.html"
 versions:
   # Latest version
-  - sha: 9cfa139fe785acb4348a2e8b814e35ec1cd89a5e
+  - sha: 05253ac3a99e148c6e13e044ea22f055856c40a2
     changeNotes: 1.0.0 Add more support for GA4 mapping.
