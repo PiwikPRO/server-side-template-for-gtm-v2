@@ -35,7 +35,7 @@ ___TEMPLATE_PARAMETERS___
   {
     "type": "TEXT",
     "name": "instanceName",
-    "displayName": "Piwik PRO Instance Name",
+    "displayName": "Account Name",
     "simpleValueType": true,
     "valueHint": "my-instance",
     "valueUnit": ".piwik.pro",
@@ -48,7 +48,7 @@ ___TEMPLATE_PARAMETERS___
   {
     "type": "TEXT",
     "name": "websiteId",
-    "displayName": "Application ID",
+    "displayName": "Site or App ID",
     "simpleValueType": true,
     "valueValidators": [
       {
