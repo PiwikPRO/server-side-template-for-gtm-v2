@@ -676,6 +676,7 @@ const convertEcommerce = itemArr => {
 // Build a map of all params defined in the UI
 const uiParamMap = {
   idsite: data.websiteId,
+  rec: 1,
   uia: data.anonymous === 'uia' ? 1 : eventData['x-pp-uia'] || 0,
   rmip: data.anonymous === 'rmip' ? 1 : eventData['x-pp-rmip'] || 0,
   action_name: data.action_name || eventData['x-pp-action_name'] || (data.eventType === 'pageview' || eventData.event_name === 'page_view' ? eventData.page_title : undefined),
