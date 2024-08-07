@@ -2,5 +2,7 @@ homepage: "https://www.piwik.pro/"
 documentation: "https://developers.piwik.pro/en/latest/data_collection/api/http_api.html"
 versions:
   # Latest version
+  - sha: 011dbc572a73710afb4cc7b8dff08a09711ffb31
+    changeNotes: 1.0.1 Add support of Stape logging format.
   - sha: cc79a181af00ed2de178dffd497667de0a4855a8
     changeNotes: 1.0.0 Add more support for GA4 mapping.
