@@ -1,4 +1,4 @@
-﻿___TERMS_OF_SERVICE___
+___TERMS_OF_SERVICE___
 
 By creating or modifying this file you agree to Google Tag Manager's Community
 Template Gallery Developer Terms of Service available at
@@ -577,17 +577,46 @@ ___TEMPLATE_PARAMETERS___
         ]
       }
     ]
+  },
+  {
+    "displayName": "Logs Settings",
+    "name": "logsGroup",
+    "groupStyle": "ZIPPY_CLOSED",
+    "type": "GROUP",
+    "subParams": [
+      {
+        "type": "RADIO",
+        "name": "logType",
+        "radioItems": [
+          {
+            "value": "no",
+            "displayValue": "Do not log"
+          },
+          {
+            "value": "debug",
+            "displayValue": "Log to console during debug and preview"
+          },
+          {
+            "value": "always",
+            "displayValue": "Always log to console"
+          }
+        ],
+        "simpleValueType": true,
+        "defaultValue": "debug"
+      }
+    ]
   }
 ]
 
 
 ___SANDBOXED_JS_FOR_SERVER___
 
-// Enter your template code here.
+// API declarations, alphabetical order
 const createRegex = require('createRegex');
 const encodeUriComponent = require('encodeUriComponent');
 const eventData = require('getAllEventData')();
-const getTimestampMillis = require('getTimestampMillis');
+const getContainerVersion = require('getContainerVersion');
+const getRequestHeader = require('getRequestHeader');
 const getType = require('getType');
 const JSON = require('JSON');
 const logToConsole = require('logToConsole');
@@ -595,25 +624,47 @@ const makeNumber = require('makeNumber');
 const makeString = require('makeString');
 const Object = require('Object');
 const sendHttpRequest = require('sendHttpRequest');
-const setResponseBody = require('setResponseBody');
 const setResponseHeader = require('setResponseHeader');
 const setResponseStatus = require('setResponseStatus');
 const sha256Sync = require('sha256Sync');
 const testRegex = require('testRegex');
 
+// Template constants
 const ENDPOINT = 'https://' + data.instanceName + '.piwik.pro/ppms.php';
-const LIBRARY_NAME = 'sgtm';
-const LIBRARY_VERSION = '1.0.0';
-const LOG_PREFIX = '[ppms_tag] ';
-
-/** 
- * Logging helper.
- *
- * @param {String} message - the message to be logged.
- */
-const log = msg => {
-  logToConsole(LOG_PREFIX + msg);
+const HEADERS = {
+  'content-type': 'application/x-www-form-urlencoded'
 };
+const LIBRARY_NAME = 'sgtm';
+const LIBRARY_VERSION = '1.0.1';
+const LOGGING_ENABLED = isLoggingEnabled();
+const TRACE_ID = LOGGING_ENABLED ? getRequestHeader('trace-id') : undefined;
+
+/**
+ * Returns if logging is enabled based on the logType value and the container version.
+ *
+ * @returns {boolean}
+ */
+function isLoggingEnabled() {
+  const containerVersion = getContainerVersion();
+  const isDebug = !!(
+      containerVersion &&
+      (containerVersion.debugMode || containerVersion.previewMode)
+  );
+
+  if (!data.logType) {
+    return isDebug;
+  }
+
+  if (data.logType === 'no') {
+    return false;
+  }
+
+  if (data.logType === 'debug') {
+    return isDebug;
+  }
+
+  return data.logType === 'always';
+}
 
 /**
  * Checks if Client ID is already a 16 character hexadecimal hash.
@@ -626,27 +677,27 @@ const getClientIdHash = () => {
   return testRegex(clientIdRegex, clientId) ? clientId : sha256Sync(clientId, {outputEncoding: 'hex'}).substring(0,16);
 };
 
-/** 
+/**
  * Returns an array of trimmed strings.
  *
  * @param {String} str - the string to be split and trimmed.
  */
 const stringToArrayAndTrim = str => str.split(',').map(item => item.trim());
 
-/** 
+/**
  * Returns an object with top-level undefined/null keys removed.
  *
  * @param {Object} obj - the object to be cleaned.
  */
 const cleanObject = (obj) => {
-  let target = {};
+  const target = {};
   Object.keys(obj).forEach((k) => {
     if (obj[k] != null) target[k] = obj[k];
   });
   return target;
 };
 
-/** 
+/**
  * Converts a GA4 ecommerce array into Piwik Pro format.
  *
  * @param {Array} itemArr - A valid GA4 items array.
@@ -655,22 +706,22 @@ const cleanObject = (obj) => {
 const convertEcommerce = itemArr => {
   if (getType(itemArr) !== 'array') return;
   return itemArr
-    .filter(item => getType(item) === 'object')
-    .map(item => {
-      return [
-        makeString(item.item_id),
-        item.item_name,
-        [item.item_category, item.item_category2, item.item_category3, item.item_category4, item.item_category5].filter(category => category),
-        item.price,
-        item.quantity,
-        item.item_brand,
-        item.item_variant,
-        Object.keys(item).reduce((acc, cur) => {
-          if (cur.slice(0,9) === 'dimension') acc[cur.slice(9)] = item[cur];
-          return acc;
-        }, {})
-      ];
-    });
+      .filter(item => getType(item) === 'object')
+      .map(item => {
+        return [
+          makeString(item.item_id),
+          item.item_name,
+          [item.item_category, item.item_category2, item.item_category3, item.item_category4, item.item_category5].filter(category => category),
+          item.price,
+          item.quantity,
+          item.item_brand,
+          item.item_variant,
+          Object.keys(item).reduce((acc, cur) => {
+            if (cur.slice(0,9) === 'dimension') acc[cur.slice(9)] = item[cur];
+            return acc;
+          }, {})
+        ];
+      });
 };
 
 // Build a map of all params defined in the UI
@@ -716,22 +767,22 @@ uiParamMap.res = eventData.screen_resolution;
 
 // Add cvar to the map
 uiParamMap.cvar = JSON.stringify(
-  data.cvars_event && data.cvars_event.length ? 
-  data.cvars_event.reduce((acc, cur) => {
-    acc[cur.id] = [cur.name, cur.value];
-    return acc;
-  }, {}) : 
-  eventData['x-pp-cvar']
+    data.cvars_event && data.cvars_event.length ?
+        data.cvars_event.reduce((acc, cur) => {
+          acc[cur.id] = [cur.name, cur.value];
+          return acc;
+        }, {}) :
+        eventData['x-pp-cvar']
 );
 
 // Add _cvar to the map
 uiParamMap._cvar = JSON.stringify(
-  data.cvars_session && data.cvars_session.length ? 
-  data.cvars_session.reduce((acc, cur) => {
-    acc[cur.id] = [cur.name, cur.value];
-    return acc;
-  }, {}) : 
-  eventData['x-pp-_cvar']
+    data.cvars_session && data.cvars_session.length ?
+        data.cvars_session.reduce((acc, cur) => {
+          acc[cur.id] = [cur.name, cur.value];
+          return acc;
+        }, {}) :
+        eventData['x-pp-_cvar']
 );
 
 // Overwrite any keys in the map with those set in Additional Parameters
@@ -743,12 +794,12 @@ let requestBody = {};
 
 // Get all Piwik-specific parameters from eventData
 Object.keys(eventData)
-  .filter(key => key.slice(0,5) === 'x-pp-')
-  .forEach(key => requestBody[key.replace('x-pp-', '')] = eventData[key]);
+    .filter(key => key.slice(0,5) === 'x-pp-')
+    .forEach(key => requestBody[key.replace('x-pp-', '')] = eventData[key]);
 
 // Overwrite the base request body with values from uiParamMap
 Object.keys(uiParamMap)
-  .forEach(key => requestBody[key] = uiParamMap[key]);
+    .forEach(key => requestBody[key] = uiParamMap[key]);
 
 // Add the library name and version
 requestBody.ts_n = LIBRARY_NAME;
@@ -756,32 +807,55 @@ requestBody.ts_v = LIBRARY_VERSION;
 
 requestBody = cleanObject(requestBody);
 
-log('Compiled request body: ' + JSON.stringify(requestBody));
+if (LOGGING_ENABLED) {
+  logToConsole(
+      JSON.stringify({
+        Name: 'PiwikPro',
+        Type: 'Request',
+        TraceId: TRACE_ID,
+        EventName: requestBody.action_name || 'page_view',
+        RequestMethod: 'POST',
+        RequestUrl: ENDPOINT,
+        RequestHeaders: HEADERS,
+        RequestBody: requestBody
+      })
+  );
+}
 
 // Build the query string
 const postBody = Object.keys(requestBody)
-  .reduce((acc, cur) => {
+    .reduce((acc, cur) => {
       acc += cur + '=' + encodeUriComponent(requestBody[cur]) + '&';
       return acc;
     }, '')
-  .slice(0, -1);
-
-log('Encoded POST body: ' + postBody);
+    .slice(0, -1);
 
 sendHttpRequest(ENDPOINT, {
-  headers: {
-    'content-type': 'application/x-www-form-urlencoded'
-  }, 
-  method: 'POST', 
+  headers: HEADERS,
+  method: 'POST',
   timeout: 1000
- }, postBody).then(response => {
+}, postBody).then(response => {
+  if (LOGGING_ENABLED) {
+    logToConsole(
+        JSON.stringify({
+          Name: 'PiwikPro',
+          Type: 'Response',
+          TraceId: TRACE_ID,
+          EventName: requestBody.action_name || 'page_view',
+          ResponseStatusCode: response.statusCode,
+          ResponseHeaders: response.headers,
+          ResponseBody: response.body,
+        })
+    );
+  }
+
   setResponseStatus(response.statusCode);
   setResponseHeader('cache-control', response.headers['cache-control']);
   if (response.statusCode < 400) {
     data.gtmOnSuccess();
   } else {
     data.gtmOnFailure();
-  } 
+  }
 });
 
 
@@ -888,6 +962,81 @@ ___SERVER_PERMISSIONS___
     },
     "clientAnnotations": {
       "isEditedByUser": true
+    },
+    "isRequired": true
+  },
+  {
+    "instance": {
+      "key": {
+        "publicId": "read_request",
+        "versionId": "1"
+      },
+      "param": [
+        {
+          "key": "headerWhitelist",
+          "value": {
+            "type": 2,
+            "listItem": [
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "headerName"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "trace-id"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "key": "headersAllowed",
+          "value": {
+            "type": 8,
+            "boolean": true
+          }
+        },
+        {
+          "key": "requestAccess",
+          "value": {
+            "type": 1,
+            "string": "specific"
+          }
+        },
+        {
+          "key": "headerAccess",
+          "value": {
+            "type": 1,
+            "string": "specific"
+          }
+        },
+        {
+          "key": "queryParameterAccess",
+          "value": {
+            "type": 1,
+            "string": "any"
+          }
+        }
+      ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
+    },
+    "isRequired": true
+  },
+  {
+    "instance": {
+      "key": {
+        "publicId": "read_container_data",
+        "versionId": "1"
+      },
+      "param": []
     },
     "isRequired": true
   }
