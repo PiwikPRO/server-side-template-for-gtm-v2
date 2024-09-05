@@ -1,4 +1,4 @@
-___TERMS_OF_SERVICE___
+﻿___TERMS_OF_SERVICE___
 
 By creating or modifying this file you agree to Google Tag Manager's Community
 Template Gallery Developer Terms of Service available at
@@ -318,10 +318,6 @@ ___TEMPLATE_PARAMETERS___
         "macrosInSelect": false,
         "selectItems": [
           {
-            "value": "inherit",
-            "displayValue": "Inherit from Client"
-          },
-          {
             "value": "product_detail_view",
             "displayValue": "product_detail_view"
           },
@@ -342,7 +338,8 @@ ___TEMPLATE_PARAMETERS___
             "displayValue": "order"
           }
         ],
-        "simpleValueType": true
+        "simpleValueType": true,
+        "notSetText": "Inherit from Client"
       },
       {
         "type": "TEXT",
@@ -397,14 +394,10 @@ ___TEMPLATE_PARAMETERS___
         "name": "ec_products",
         "displayName": "Products",
         "macrosInSelect": true,
-        "selectItems": [
-          {
-            "value": "inherit",
-            "displayValue": "Inherit from Client"
-          }
-        ],
+        "selectItems": [],
         "simpleValueType": true,
-        "help": "Set to a variable that returns an \u003cstrong\u003earray\u003c/strong\u003e of \u003ca href\u003d\"https://developers.google.com/tag-platform/gtagjs/reference/events#purchase_item\"\u003ecorrectly formatted \u003ccode\u003eitem\u003c/code\u003e objects\u003c/a\u003e. Choose \"Inherit from Client\" to inherit from the Client. \u003ca href\u003d\"https://help.piwik.pro/support/getting-started/track-ecommerce/\"\u003eRead more\u003c/a\u003e."
+        "help": "Set to a variable that returns an \u003cstrong\u003earray\u003c/strong\u003e of \u003ca href\u003d\"https://developers.google.com/tag-platform/gtagjs/reference/events#purchase_item\"\u003ecorrectly formatted \u003ccode\u003eitem\u003c/code\u003e objects\u003c/a\u003e. Choose \"Inherit from Client\" to inherit from the Client. \u003ca href\u003d\"https://help.piwik.pro/support/getting-started/track-ecommerce/\"\u003eRead more\u003c/a\u003e.",
+        "notSetText": "Inherit from Client"
       }
     ],
     "enablingConditions": [
@@ -635,7 +628,7 @@ const HEADERS = {
   'content-type': 'application/x-www-form-urlencoded'
 };
 const LIBRARY_NAME = 'sgtm';
-const LIBRARY_VERSION = '1.0.1';
+const LIBRARY_VERSION = '1.0.2';
 const LOGGING_ENABLED = isLoggingEnabled();
 const TRACE_ID = LOGGING_ENABLED ? getRequestHeader('trace-id') : undefined;
 
@@ -745,14 +738,14 @@ const uiParamMap = {
   _id: data._id || getClientIdHash(),
   uid: data.uid || eventData.user_id,
   cip: data.cip || eventData.ip_override,
-  e_t: data.e_t === 'inherit' ? eventData['x-pp-e_t'] : data.e_t,
+  e_t: data.e_t || eventData['x-pp-e_t'],
   ec_id: data.ec_id || eventData['x-pp-ec_id'] || eventData.transaction_id,
-  revenue: data.revenue || (data.eventType === 'ecommerce' ? eventData.value : undefined),
+  revenue: data.revenue || eventData.value,
   ec_st: data.ec_st || eventData['x-pp-ec_st'],
   ec_sh: data.ec_sh || eventData['x-pp-ec_sh'],
   ec_tx: data.ec_tx || eventData['x-pp-ec_tx'],
   ec_dt: data.ec_dt || eventData['x-pp-ec_dt'],
-  ec_products: data.ec_products === 'inherit' ? eventData['x-pp-ec_products'] || JSON.stringify(convertEcommerce(eventData.items)) : JSON.stringify(convertEcommerce(data.ec_products))
+  ec_products: JSON.stringify(convertEcommerce(data.ec_products)) || JSON.stringify(eventData['x-pp-ec_products']) || JSON.stringify(convertEcommerce(eventData.items))
 };
 
 // Set the common event data params
