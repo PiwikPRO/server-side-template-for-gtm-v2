@@ -318,20 +318,20 @@ ___TEMPLATE_PARAMETERS___
         "macrosInSelect": false,
         "selectItems": [
           {
-            "value": "product_detail_view",
-            "displayValue": "product_detail_view"
+            "value": "product-detail-view",
+            "displayValue": "product-detail-view"
           },
           {
-            "value": "add_to_cart",
-            "displayValue": "add_to_cart"
+            "value": "add-to-cart",
+            "displayValue": "add-to-cart"
           },
           {
-            "value": "cart_update",
-            "displayValue": "cart_update"
+            "value": "cart-update",
+            "displayValue": "cart-update"
           },
           {
-            "value": "remove_from_cart",
-            "displayValue": "remove_from_cart"
+            "value": "remove-from-cart",
+            "displayValue": "remove-from-cart"
           },
           {
             "value": "order",
