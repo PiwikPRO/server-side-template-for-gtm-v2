@@ -2,6 +2,8 @@ homepage: "https://www.piwik.pro/"
 documentation: "https://developers.piwik.pro/en/latest/data_collection/api/http_api.html"
 versions:
   # Latest version
+  - sha: f6861b00fab0ef27117773940ce1f98309b636c3
+    changeNotes: 1.0.3 Fix ecommerce event types
   - sha: 1740ffa020c327748cc4f0a8e52876e3d611848c
     changeNotes: 1.0.2 Fix issue with ecommerce inherit
   - sha: 011dbc572a73710afb4cc7b8dff08a09711ffb31
