@@ -22,7 +22,7 @@ const HEADERS = {
   'content-type': 'application/x-www-form-urlencoded'
 };
 const LIBRARY_NAME = 'sgtm';
-const LIBRARY_VERSION = '1.0.1';
+const LIBRARY_VERSION = '1.0.3';
 const LOGGING_ENABLED = isLoggingEnabled();
 const TRACE_ID = LOGGING_ENABLED ? getRequestHeader('trace-id') : undefined;
 
