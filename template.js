@@ -22,7 +22,7 @@ const HEADERS = {
   'content-type': 'application/x-www-form-urlencoded'
 };
 const LIBRARY_NAME = 'sgtm';
-const LIBRARY_VERSION = '1.0.3';
+const LIBRARY_VERSION = '1.0.4';
 const LOGGING_ENABLED = isLoggingEnabled();
 const TRACE_ID = LOGGING_ENABLED ? getRequestHeader('trace-id') : undefined;
 
@@ -62,6 +62,22 @@ const getClientIdHash = () => {
   if (!clientId) return;
   const clientIdRegex = createRegex('^[0-9a-fA-F]{16}$');
   return testRegex(clientIdRegex, clientId) ? clientId : sha256Sync(clientId, {outputEncoding: 'hex'}).substring(0,16);
+};
+
+/**
+ * Maps a valid GA4 Ecommerce event name from the Event Data object
+ * to its corresponding Piwik PRO Ecommerce Event Type.
+ *
+ * @returns {String} – the mapped ecommerce event name (if available).
+ */
+const mapGA4EcommerceEvent = () => {
+  const map = {
+    view_item: 'product-detail-view',
+    add_to_cart: 'add-to-cart',
+    remove_from_cart: 'remove-from-cart',
+    purchase: 'order'
+  };
+  return map[eventData.event_name];
 };
 
 /**
@@ -132,7 +148,7 @@ const uiParamMap = {
   _id: data._id || getClientIdHash(),
   uid: data.uid || eventData.user_id,
   cip: data.cip || eventData.ip_override,
-  e_t: data.e_t || eventData['x-pp-e_t'],
+  e_t: data.e_t || mapGA4EcommerceEvent() || eventData['x-pp-e_t'],
   ec_id: data.ec_id || eventData['x-pp-ec_id'] || eventData.transaction_id,
   revenue: data.revenue || eventData.value,
   ec_st: data.ec_st || eventData['x-pp-ec_st'],
